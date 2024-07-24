@@ -2,7 +2,6 @@ const express = require('express');
 const cheerio = require('cheerio');
 const {get} = require('axios');
 const cors = require('cors');
-const translate = require('google-translate-api');
 const app = express();
 
 
@@ -127,6 +126,24 @@ app.get('/inbox', async (req, res) => {
 
 
 
+async function translateText(text, langCode) {
+  try {
+    const response = await axios.get('https://translate.googleapis.com/translate_a/single', {
+      params: {
+        client: 'gtx',
+        sl: 'auto',
+        tl: langCode,
+        dt: 't',
+        q: text
+      }
+    });
+    return response.data[0][0][0];
+  } catch (error) {
+    console.error('Error during translation:', error);
+    return text;
+  }
+}
+
 app.get('/delemail', async (req, res) => {
   const em = req.query.email;
   if (!em) {
@@ -136,19 +153,8 @@ app.get('/delemail', async (req, res) => {
     const response = await axios.get(API + '/delete_email.php', { params: { email: em } });
     const dat = response.data;
 
-    
-    async function translateResponse(text) {
-      try {
-        const translation = await translate(text, { to: 'ar' });
-        return translation.text;
-      } catch (error) {
-        console.error('Error during translation:', error);
-        return text;
-      }
-    }
-
     if (dat.status) {
-      const translatedResponse = await translateResponse(dat.response);
+      const translatedResponse = await translateText(dat.response, 'ar'); // الترجمة إلى العربية
       res.json({
         status: true,
         message: translatedResponse
@@ -166,6 +172,7 @@ app.get('/delemail', async (req, res) => {
     });
   }
 });
+
 
 
 
