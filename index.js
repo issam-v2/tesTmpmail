@@ -133,11 +133,11 @@ app.get('/delemail', async (req, res) => {
   try {
     const req = await get(API + '/delete_email.php', { params: { email: em } });
     const dat = req.data;
-
+    
     if (dat.status) {
       res.json({
         status: true,
-        message: dat.response
+        message: dat.response === "Email deleted" ? "تم الحذف بنجاح" : "حدث خطاء " /*kssl*/
       });
     } else {
       res.json({
