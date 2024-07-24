@@ -126,23 +126,7 @@ app.get('/inbox', async (req, res) => {
 
 
 
-async function translateText(text, langCode) {
-  try {
-    const response = await axios.get('https://translate.googleapis.com/translate_a/single', {
-      params: {
-        client: 'gtx',
-        sl: 'auto',
-        tl: langCode,
-        dt: 't',
-        q: text
-      }
-    });
-    return response.data[0][0][0];
-  } catch (error) {
-    console.error('Error during translation:', error);
-    return text;
-  }
-}
+
 
    
       app.get('/delemail', async (req, res) => {
@@ -153,11 +137,12 @@ async function translateText(text, langCode) {
   try {
     const req = await get(API + '/delete_email.php', { params: { email: em } });
     const dat = req.data;
-    const translatedResponse = await translateText(dat.response, 'ar');
+    
     if (dat.status) {
       res.json({
         status: true,
-        message: translatedResponse,
+        message: dat.response,
+        
       });
     } else {
       res.json({
