@@ -5,7 +5,6 @@ const cors = require('cors');
 const app = express();
 
 
-
 const API = 'https://t-mail.tech';
 
 
