@@ -144,20 +144,20 @@ async function translateText(text, langCode) {
   }
 }
 
-app.get('/delemail', async (req, res) => {
+   
+      app.get('/delemail', async (req, res) => {
   const em = req.query.email;
   if (!em) {
     return res.json({ status: false, error: msg.provide() });
   }
   try {
-    const response = await axios.get(API + '/delete_email.php', { params: { email: em } });
-    const dat = response.data;
-
+    const req = await get(API + '/delete_email.php', { params: { email: em } });
+    const dat = req.data;
+    const translatedResponse = await translateText(dat.response, 'ar');
     if (dat.status) {
-      const translatedResponse = await translateText(dat.response, 'ar'); // الترجمة إلى العربية
       res.json({
         status: true,
-        message: translatedResponse
+        message: translatedResponse,
       });
     } else {
       res.json({
@@ -172,6 +172,7 @@ app.get('/delemail', async (req, res) => {
     });
   }
 });
+                     
 
 
 
