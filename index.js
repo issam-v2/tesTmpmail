@@ -2,6 +2,7 @@ const express = require('express');
 const cheerio = require('cheerio');
 const {get} = require('axios');
 const cors = require('cors');
+const translate = require('google-translate-api');
 const app = express();
 
 
@@ -125,19 +126,32 @@ app.get('/inbox', async (req, res) => {
 
 
 
+
 app.get('/delemail', async (req, res) => {
   const em = req.query.email;
   if (!em) {
     return res.json({ status: false, error: msg.provide() });
   }
   try {
-    const req = await get(API + '/delete_email.php', { params: { email: em } });
-    const dat = req.data;
+    const response = await axios.get(API + '/delete_email.php', { params: { email: em } });
+    const dat = response.data;
+
     
+    async function translateResponse(text) {
+      try {
+        const translation = await translate(text, { to: 'ar' });
+        return translation.text;
+      } catch (error) {
+        console.error('Error during translation:', error);
+        return text;
+      }
+    }
+
     if (dat.status) {
+      const translatedResponse = await translateResponse(dat.response);
       res.json({
         status: true,
-        message: dat.response === "Email deleted" ? "تم الحذف بنجاح" : "حدث خطاء " /*kssl*/
+        message: translatedResponse
       });
     } else {
       res.json({
